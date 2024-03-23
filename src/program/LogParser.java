@@ -1,7 +1,9 @@
 package program;
 
+import query.DateQuery;
 import query.IPQuery;
 import query.UserQuery;
+
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -14,7 +16,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class LogParser implements IPQuery, UserQuery {
+public class LogParser implements IPQuery, UserQuery, DateQuery {
     private Path logDir;
     private List<LogEntity> logEntities = new ArrayList<>();
     private DateFormat simpleDateFormat = new SimpleDateFormat("d.M.yyyy H:m:s");
@@ -320,6 +322,141 @@ public class LogParser implements IPQuery, UserQuery {
             if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
                 if (logEntities.get(i).getEvent().equals(Event.DONE_TASK) && logEntities.get(i).getEventAddParam() == task) {
                     result.add(logEntities.get(i).getUser());
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Set<Date> getDatesForUserAndEvent(String user, Event event, Date after, Date before) {
+        Set<Date> result = new HashSet<>();
+        for (int i = 0; i < logEntities.size(); i++) {
+            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
+                if (logEntities.get(i).getUser().equals(user) && logEntities.get(i).getEvent().equals(event)) {
+                    result.add(logEntities.get(i).getDate());
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Set<Date> getDatesWhenSomethingFailed(Date after, Date before) {
+        Set<Date> result = new HashSet<>();
+        for (int i = 0; i < logEntities.size(); i++) {
+            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
+                if (logEntities.get(i).getStatus().equals(Status.FAILED)) {
+                    result.add(logEntities.get(i).getDate());
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Set<Date> getDatesWhenErrorHappened(Date after, Date before) {
+        Set<Date> result = new HashSet<>();
+        for (int i = 0; i < logEntities.size(); i++) {
+            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
+                if (logEntities.get(i).getStatus().equals(Status.ERROR)) {
+                    result.add(logEntities.get(i).getDate());
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Date getDateWhenUserLoggedFirstTime(String user, Date after, Date before) {
+        Set<Date> result = new HashSet<>();
+        for (int i = 0; i < logEntities.size(); i++) {
+            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
+                if (logEntities.get(i).getUser().equals(user)
+                        && logEntities.get(i).getEvent().equals(Event.LOGIN)) {
+                    result.add(logEntities.get(i).getDate());
+                }
+            }
+        }
+        if (result.size() == 0) {
+            return null;
+        }
+        Date minDate = result.iterator().next();
+        for (Date date : result) {
+            if (date.getTime() < minDate.getTime())
+                minDate = date;
+        }
+        return minDate;
+    }
+
+    @Override
+    public Date getDateWhenUserSolvedTask(String user, int task, Date after, Date before) {
+        Set<Date> result = new HashSet<>();
+        for (int i = 0; i < logEntities.size(); i++) {
+            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
+                if (logEntities.get(i).getUser().equals(user)
+                        && logEntities.get(i).getEvent().equals(Event.SOLVE_TASK)
+                        && logEntities.get(i).getEventAddParam() == task) {
+                    result.add(logEntities.get(i).getDate());
+                }
+            }
+        }
+        if (result.size() == 0) {
+            return null;
+        }
+        Date minDate = result.iterator().next();
+        for (Date date : result) {
+            if (date.getTime() < minDate.getTime())
+                minDate = date;
+        }
+        return minDate;
+    }
+
+    @Override
+    public Date getDateWhenUserDoneTask(String user, int task, Date after, Date before) {
+        Set<Date> result = new HashSet<>();
+        for (int i = 0; i < logEntities.size(); i++) {
+            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
+                if (logEntities.get(i).getUser().equals(user)
+                        && logEntities.get(i).getEvent().equals(Event.DONE_TASK)
+                        && logEntities.get(i).getEventAddParam() == task) {
+                    result.add(logEntities.get(i).getDate());
+                }
+            }
+        }
+        if (result.size() == 0) {
+            return null;
+        }
+        Date minDate = result.iterator().next();
+        for (Date date : result) {
+            if (date.getTime() < minDate.getTime())
+                minDate = date;
+        }
+        return minDate;
+    }
+
+    @Override
+    public Set<Date> getDatesWhenUserWroteMessage(String user, Date after, Date before) {
+        Set<Date> result = new HashSet<>();
+        for (int i = 0; i < logEntities.size(); i++) {
+            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
+                if (logEntities.get(i).getUser().equals(user)
+                        && logEntities.get(i).getEvent().equals(Event.WRITE_MESSAGE)) {
+                    result.add(logEntities.get(i).getDate());
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Set<Date> getDatesWhenUserDownloadedPlugin(String user, Date after, Date before) {
+        Set<Date> result = new HashSet<>();
+        for (int i = 0; i < logEntities.size(); i++) {
+            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
+                if (logEntities.get(i).getUser().equals(user)
+                        && logEntities.get(i).getEvent().equals(Event.DOWNLOAD_PLUGIN)) {
+                    result.add(logEntities.get(i).getDate());
                 }
             }
         }
