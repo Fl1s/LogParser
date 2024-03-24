@@ -8,7 +8,7 @@ public class GetIpCommand extends Command {
     }
 
     @Override
-    Object execute() {
+    public Object execute() {
         return logEntity.getIp();
     }
 }

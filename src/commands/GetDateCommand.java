@@ -8,7 +8,7 @@ public class GetDateCommand extends Command {
     }
 
     @Override
-    Object execute() {
+    public Object execute() {
         return logEntity.getDate();
     }
 }

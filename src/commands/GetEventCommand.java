@@ -8,7 +8,7 @@ public class GetEventCommand extends Command {
     }
 
     @Override
-    Object execute() {
+    public Object execute() {
         return logEntity.getEvent();
     }
 }

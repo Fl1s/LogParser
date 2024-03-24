@@ -1,10 +1,7 @@
 package program;
 
-import commands.Command;
-import query.DateQuery;
-import query.EventQuery;
-import query.IPQuery;
-import query.UserQuery;
+import commands.*;
+import query.*;
 
 
 import java.io.BufferedReader;
@@ -20,7 +17,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery {
+public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery, QLQuery {
     private Path logDir;
     private List<LogEntity> logEntities = new ArrayList<>();
     private DateFormat simpleDateFormat = new SimpleDateFormat("d.M.yyyy H:m:s");
@@ -594,15 +591,40 @@ public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery {
     @Override
     public Set<Object> execute(String query) {
         Set<Object> result = new HashSet<>();
-        String field;
-        Pattern pattern = Pattern.compile("get (ip|user|date|event|status)");
+        String field1;
+        String field2 = null;
+        String value1 = null;
+        Pattern pattern = Pattern.compile("get (ip|user|date|event|status)"
+                + "( for (ip|user|date|event|status) = \"(.*?)\")?");
         Matcher matcher = pattern.matcher(query);
         matcher.find();
-        field = matcher.group(1);
-
-        for (int i = 0; i < logEntities.size(); i++) {
-            result.add(getCurrentValue(logEntities.get(i), field));
+        field1 = matcher.group(1);
+        if (matcher.group(2) != null) {
+            field2 = matcher.group(3);
+            value1 = matcher.group(4);
         }
+
+        if (field2 != null && value1 != null) {
+            for (int i = 0; i < logEntities.size(); i++) {
+                if (field2.equals("date")) {
+                    try {
+                        if (logEntities.get(i).getDate().getTime() == simpleDateFormat.parse(value1).getTime()) {
+                            result.add(getCurrentValue(logEntities.get(i), field1));
+                        }
+                    } catch (ParseException e) {
+                    }
+                } else {
+                    if (value1.equals(getCurrentValue(logEntities.get(i), field2).toString())) {
+                        result.add(getCurrentValue(logEntities.get(i), field1));
+                    }
+                }
+            }
+        } else {
+            for (int i = 0; i < logEntities.size(); i++) {
+                result.add(getCurrentValue(logEntities.get(i), field1));
+            }
+        }
+
         return result;
     }
 

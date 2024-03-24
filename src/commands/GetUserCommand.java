@@ -8,7 +8,7 @@ public class GetUserCommand extends Command {
     }
 
     @Override
-    Object execute() {
+    public Object execute() {
         return logEntity.getUser();
     }
 }

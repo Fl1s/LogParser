@@ -8,7 +8,7 @@ public class GetStatusCommand extends Command {
     }
 
     @Override
-    Object execute() {
+    public Object execute() {
         return logEntity.getStatus();
     }
 }
