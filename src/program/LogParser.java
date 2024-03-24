@@ -605,23 +605,23 @@ public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery, QLQ
         }
 
         if (field2 != null && value1 != null) {
-            for (int i = 0; i < logEntities.size(); i++) {
+            for (LogEntity logEntity : logEntities) {
                 if (field2.equals("date")) {
                     try {
-                        if (logEntities.get(i).getDate().getTime() == simpleDateFormat.parse(value1).getTime()) {
-                            result.add(getCurrentValue(logEntities.get(i), field1));
+                        if (logEntity.getDate().getTime() == simpleDateFormat.parse(value1).getTime()) {
+                            result.add(getCurrentValue(logEntity, field1));
                         }
-                    } catch (ParseException e) {
+                    } catch (ParseException ignored) {
                     }
                 } else {
-                    if (value1.equals(getCurrentValue(logEntities.get(i), field2).toString())) {
-                        result.add(getCurrentValue(logEntities.get(i), field1));
+                    if (value1.equals(getCurrentValue(logEntity, field2).toString())) {
+                        result.add(getCurrentValue(logEntity, field1));
                     }
                 }
             }
         } else {
-            for (int i = 0; i < logEntities.size(); i++) {
-                result.add(getCurrentValue(logEntities.get(i), field1));
+            for (LogEntity logEntity : logEntities) {
+                result.add(getCurrentValue(logEntity, field1));
             }
         }
 
