@@ -1,6 +1,7 @@
 package program;
 
 import query.DateQuery;
+import query.EventQuery;
 import query.IPQuery;
 import query.UserQuery;
 
@@ -12,11 +13,12 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DateFormat;
+import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class LogParser implements IPQuery, UserQuery, DateQuery {
+public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery {
     private Path logDir;
     private List<LogEntity> logEntities = new ArrayList<>();
     private DateFormat simpleDateFormat = new SimpleDateFormat("d.M.yyyy H:m:s");
@@ -44,9 +46,9 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Set<String> getUniqueIPs(Date after, Date before) {
         Set<String> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                result.add(logEntities.get(i).getIp());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                result.add(logEntity.getIp());
             }
         }
         return result;
@@ -55,10 +57,10 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Set<String> getIPsForUser(String user, Date after, Date before) {
         Set<String> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getUser().equals(user)) {
-                    result.add(logEntities.get(i).getIp());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getUser().equals(user)) {
+                    result.add(logEntity.getIp());
                 }
             }
         }
@@ -68,10 +70,10 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Set<String> getIPsForEvent(Event event, Date after, Date before) {
         Set<String> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getEvent().equals(event)) {
-                    result.add(logEntities.get(i).getIp());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getEvent().equals(event)) {
+                    result.add(logEntity.getIp());
                 }
             }
         }
@@ -81,10 +83,10 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Set<String> getIPsForStatus(Status status, Date after, Date before) {
         Set<String> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getStatus().equals(status)) {
-                    result.add(logEntities.get(i).getIp());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getStatus().equals(status)) {
+                    result.add(logEntity.getIp());
                 }
             }
         }
@@ -194,8 +196,8 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Set<String> getAllUsers() {
         Set<String> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            result.add(logEntities.get(i).getUser());
+        for (LogEntity logEntity : logEntities) {
+            result.add(logEntity.getUser());
         }
         return result;
     }
@@ -203,9 +205,9 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public int getNumberOfUsers(Date after, Date before) {
         Set<String> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                result.add(logEntities.get(i).getUser());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                result.add(logEntity.getUser());
             }
         }
         return result.size();
@@ -214,10 +216,10 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public int getNumberOfUserEvents(String user, Date after, Date before) {
         Set<Event> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getUser().equals(user)) {
-                    result.add(logEntities.get(i).getEvent());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getUser().equals(user)) {
+                    result.add(logEntity.getEvent());
                 }
             }
         }
@@ -227,10 +229,10 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Set<String> getUsersForIP(String ip, Date after, Date before) {
         Set<String> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getIp().equals(ip)) {
-                    result.add(logEntities.get(i).getUser());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getIp().equals(ip)) {
+                    result.add(logEntity.getUser());
                 }
             }
         }
@@ -240,10 +242,10 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Set<String> getLoggedUsers(Date after, Date before) {
         Set<String> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getEvent().equals(Event.LOGIN)) {
-                    result.add(logEntities.get(i).getUser());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getEvent().equals(Event.LOGIN)) {
+                    result.add(logEntity.getUser());
                 }
             }
         }
@@ -253,10 +255,10 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Set<String> getDownloadedPluginUsers(Date after, Date before) {
         Set<String> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getEvent().equals(Event.DOWNLOAD_PLUGIN)) {
-                    result.add(logEntities.get(i).getUser());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getEvent().equals(Event.DOWNLOAD_PLUGIN)) {
+                    result.add(logEntity.getUser());
                 }
             }
         }
@@ -266,10 +268,10 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Set<String> getWroteMessageUsers(Date after, Date before) {
         Set<String> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getEvent().equals(Event.WRITE_MESSAGE)) {
-                    result.add(logEntities.get(i).getUser());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getEvent().equals(Event.WRITE_MESSAGE)) {
+                    result.add(logEntity.getUser());
                 }
             }
         }
@@ -279,10 +281,10 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Set<String> getSolvedTaskUsers(Date after, Date before) {
         Set<String> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getEvent().equals(Event.SOLVE_TASK)) {
-                    result.add(logEntities.get(i).getUser());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getEvent().equals(Event.SOLVE_TASK)) {
+                    result.add(logEntity.getUser());
                 }
             }
         }
@@ -292,10 +294,10 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Set<String> getSolvedTaskUsers(Date after, Date before, int task) {
         Set<String> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getEvent().equals(Event.SOLVE_TASK) && logEntities.get(i).getEventAddParam() == task) {
-                    result.add(logEntities.get(i).getUser());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getEvent().equals(Event.SOLVE_TASK) && logEntity.getEventAddParam() == task) {
+                    result.add(logEntity.getUser());
                 }
             }
         }
@@ -305,10 +307,10 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Set<String> getDoneTaskUsers(Date after, Date before) {
         Set<String> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getEvent().equals(Event.DONE_TASK)) {
-                    result.add(logEntities.get(i).getUser());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getEvent().equals(Event.DONE_TASK)) {
+                    result.add(logEntity.getUser());
                 }
             }
         }
@@ -318,10 +320,10 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Set<String> getDoneTaskUsers(Date after, Date before, int task) {
         Set<String> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getEvent().equals(Event.DONE_TASK) && logEntities.get(i).getEventAddParam() == task) {
-                    result.add(logEntities.get(i).getUser());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getEvent().equals(Event.DONE_TASK) && logEntity.getEventAddParam() == task) {
+                    result.add(logEntity.getUser());
                 }
             }
         }
@@ -331,10 +333,10 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Set<Date> getDatesForUserAndEvent(String user, Event event, Date after, Date before) {
         Set<Date> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getUser().equals(user) && logEntities.get(i).getEvent().equals(event)) {
-                    result.add(logEntities.get(i).getDate());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getUser().equals(user) && logEntity.getEvent().equals(event)) {
+                    result.add(logEntity.getDate());
                 }
             }
         }
@@ -344,10 +346,10 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Set<Date> getDatesWhenSomethingFailed(Date after, Date before) {
         Set<Date> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getStatus().equals(Status.FAILED)) {
-                    result.add(logEntities.get(i).getDate());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getStatus().equals(Status.FAILED)) {
+                    result.add(logEntity.getDate());
                 }
             }
         }
@@ -357,10 +359,10 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Set<Date> getDatesWhenErrorHappened(Date after, Date before) {
         Set<Date> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getStatus().equals(Status.ERROR)) {
-                    result.add(logEntities.get(i).getDate());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getStatus().equals(Status.ERROR)) {
+                    result.add(logEntity.getDate());
                 }
             }
         }
@@ -370,15 +372,15 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Date getDateWhenUserLoggedFirstTime(String user, Date after, Date before) {
         Set<Date> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getUser().equals(user)
-                        && logEntities.get(i).getEvent().equals(Event.LOGIN)) {
-                    result.add(logEntities.get(i).getDate());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getUser().equals(user)
+                        && logEntity.getEvent().equals(Event.LOGIN)) {
+                    result.add(logEntity.getDate());
                 }
             }
         }
-        if (result.size() == 0) {
+        if (result.isEmpty()) {
             return null;
         }
         Date minDate = result.iterator().next();
@@ -392,16 +394,16 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Date getDateWhenUserSolvedTask(String user, int task, Date after, Date before) {
         Set<Date> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getUser().equals(user)
-                        && logEntities.get(i).getEvent().equals(Event.SOLVE_TASK)
-                        && logEntities.get(i).getEventAddParam() == task) {
-                    result.add(logEntities.get(i).getDate());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getUser().equals(user)
+                        && logEntity.getEvent().equals(Event.SOLVE_TASK)
+                        && logEntity.getEventAddParam() == task) {
+                    result.add(logEntity.getDate());
                 }
             }
         }
-        if (result.size() == 0) {
+        if (result.isEmpty()) {
             return null;
         }
         Date minDate = result.iterator().next();
@@ -415,12 +417,12 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Date getDateWhenUserDoneTask(String user, int task, Date after, Date before) {
         Set<Date> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getUser().equals(user)
-                        && logEntities.get(i).getEvent().equals(Event.DONE_TASK)
-                        && logEntities.get(i).getEventAddParam() == task) {
-                    result.add(logEntities.get(i).getDate());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getUser().equals(user)
+                        && logEntity.getEvent().equals(Event.DONE_TASK)
+                        && logEntity.getEventAddParam() == task) {
+                    result.add(logEntity.getDate());
                 }
             }
         }
@@ -438,11 +440,11 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Set<Date> getDatesWhenUserWroteMessage(String user, Date after, Date before) {
         Set<Date> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getUser().equals(user)
-                        && logEntities.get(i).getEvent().equals(Event.WRITE_MESSAGE)) {
-                    result.add(logEntities.get(i).getDate());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getUser().equals(user)
+                        && logEntity.getEvent().equals(Event.WRITE_MESSAGE)) {
+                    result.add(logEntity.getDate());
                 }
             }
         }
@@ -452,11 +454,135 @@ public class LogParser implements IPQuery, UserQuery, DateQuery {
     @Override
     public Set<Date> getDatesWhenUserDownloadedPlugin(String user, Date after, Date before) {
         Set<Date> result = new HashSet<>();
-        for (int i = 0; i < logEntities.size(); i++) {
-            if (dateBetweenDates(logEntities.get(i).getDate(), after, before)) {
-                if (logEntities.get(i).getUser().equals(user)
-                        && logEntities.get(i).getEvent().equals(Event.DOWNLOAD_PLUGIN)) {
-                    result.add(logEntities.get(i).getDate());
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getUser().equals(user)
+                        && logEntity.getEvent().equals(Event.DOWNLOAD_PLUGIN)) {
+                    result.add(logEntity.getDate());
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public int getNumberOfAllEvents(Date after, Date before) {
+        return getAllEvents(after, before).size();
+    }
+
+    @Override
+    public Set<Event> getAllEvents(Date after, Date before) {
+        Set<Event> result = new HashSet<>();
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                result.add(logEntity.getEvent());
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Set<Event> getEventsForIP(String ip, Date after, Date before) {
+        Set<Event> result = new HashSet<>();
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getIp().equals(ip)) {
+                    result.add(logEntity.getEvent());
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Set<Event> getEventsForUser(String user, Date after, Date before) {
+        Set<Event> result = new HashSet<>();
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getUser().equals(user)) {
+                    result.add(logEntity.getEvent());
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Set<Event> getFailedEvents(Date after, Date before) {
+        Set<Event> result = new HashSet<>();
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getStatus().equals(Status.FAILED)) {
+                    result.add(logEntity.getEvent());
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Set<Event> getErrorEvents(Date after, Date before) {
+        Set<Event> result = new HashSet<>();
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getStatus().equals(Status.ERROR)) {
+                    result.add(logEntity.getEvent());
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public int getNumberOfAttemptToSolveTask(int task, Date after, Date before) {
+        int count = 0;
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getEvent().equals(Event.SOLVE_TASK) && logEntity.getEventAddParam() == task) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    @Override
+    public int getNumberOfSuccessfulAttemptToSolveTask(int task, Date after, Date before) {
+        int count = 0;
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getEvent().equals(Event.DONE_TASK) && logEntity.getEventAddParam() == task) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    @Override
+    public Map<Integer, Integer> getAllSolvedTasksAndTheirNumber(Date after, Date before) {
+        Map<Integer, Integer> result = new HashMap<>();
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getEvent().equals(Event.SOLVE_TASK)) {
+                    int task = logEntity.getEventAddParam();
+                    Integer count = result.getOrDefault(task, 0);
+                    result.put(task, count + 1);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Map<Integer, Integer> getAllDoneTasksAndTheirNumber(Date after, Date before) {
+        Map<Integer, Integer> result = new HashMap<>();
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before)) {
+                if (logEntity.getEvent().equals(Event.DONE_TASK)) {
+                    int task = logEntity.getEventAddParam();
+                    Integer count = result.getOrDefault(task, 0);
+                    result.put(task, count + 1);
                 }
             }
         }
