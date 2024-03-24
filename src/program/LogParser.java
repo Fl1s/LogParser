@@ -468,6 +468,17 @@ public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery, QLQ
     public int getNumberOfAllEvents(Date after, Date before) {
         return getAllEvents(after, before).size();
     }
+    @Override
+    public int getNumberOfEventsForIP(String ip, Date after, Date before) {
+        int count = 0;
+        for (LogEntity logEntity : logEntities) {
+            if (dateBetweenDates(logEntity.getDate(), after, before) && logEntity.getIp().equals(ip)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
 
     @Override
     public Set<Event> getAllEvents(Date after, Date before) {

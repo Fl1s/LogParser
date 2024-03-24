@@ -19,6 +19,8 @@ public interface EventQuery {
 
     Set<Event> getErrorEvents(Date after, Date before);
 
+    int getNumberOfEventsForIP(String ip, Date after, Date before);
+
     int getNumberOfAttemptToSolveTask(int task, Date after, Date before);
 
     int getNumberOfSuccessfulAttemptToSolveTask(int task, Date after, Date before);
