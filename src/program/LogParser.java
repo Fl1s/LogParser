@@ -1,5 +1,6 @@
 package program;
 
+import commands.Command;
 import query.DateQuery;
 import query.EventQuery;
 import query.IPQuery;
@@ -13,10 +14,11 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DateFormat;
-import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery {
     private Path logDir;
@@ -587,5 +589,52 @@ public class LogParser implements IPQuery, UserQuery, DateQuery, EventQuery {
             }
         }
         return result;
+    }
+
+    @Override
+    public Set<Object> execute(String query) {
+        Set<Object> result = new HashSet<>();
+        String field;
+        Pattern pattern = Pattern.compile("get (ip|user|date|event|status)");
+        Matcher matcher = pattern.matcher(query);
+        matcher.find();
+        field = matcher.group(1);
+
+        for (int i = 0; i < logEntities.size(); i++) {
+            result.add(getCurrentValue(logEntities.get(i), field));
+        }
+        return result;
+    }
+
+    private Object getCurrentValue(LogEntity logEntity, String field) {
+        Object value = null;
+        switch (field) {
+            case "ip": {
+                Command method = new GetIpCommand(logEntity);
+                value = method.execute();
+                break;
+            }
+            case "user": {
+                Command method = new GetUserCommand(logEntity);
+                value = method.execute();
+                break;
+            }
+            case "date": {
+                Command method = new GetDateCommand(logEntity);
+                value = method.execute();
+                break;
+            }
+            case "event": {
+                Command method = new GetEventCommand(logEntity);
+                value = method.execute();
+                break;
+            }
+            case "status": {
+                Command method = new GetStatusCommand(logEntity);
+                value = method.execute();
+                break;
+            }
+        }
+        return value;
     }
 }
