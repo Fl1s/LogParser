@@ -53,7 +53,7 @@ public class ConsoleInterface {
 
     private void printMenu() {
         System.out.println("┌──────────────────────────────────────────────┐");
-        System.out.println("│            Log Parser Main Menu              │");
+        System.out.println("│                  Log Parser                  │");
         System.out.println("├──────────────────────────────────────────────┤");
         System.out.println("│ 1. Print Unique IP Addresses                 │");
         System.out.println("│ 2. Print User Statistics                     │");
