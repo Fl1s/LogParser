@@ -1,7 +1,3 @@
-Here's the documentation draft for your application in English:
-
----
-
 # LogParser
 
 **LogParser** is a Java-based console utility designed for parsing and analyzing log files. The program allows you to extract and filter log data based on various criteria, such as users, IP addresses, dates, and events.
@@ -79,8 +75,4 @@ Event: LOGIN, Date: 2024-08-28, IP: 192.168.1.1, User: john_doe
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
-
----
-
-Let me know if you need any adjustments or additional details!
+This project is licensed under the MIT License.
